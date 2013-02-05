@@ -21,36 +21,37 @@ try {
     
     //登録日カウント
     c.setTime(d)
-    var regiDaylyKey =  c.get(Calendar.YEAR) + "/" + (c.get(Calendar.MONTH) + 1) + "/" + c.get(Calendar.DAY_OF_MONTH)
+    val regiDaylyKey =  c.get(Calendar.YEAR) + "/" + (c.get(Calendar.MONTH) + 1) + "/" + c.get(Calendar.DAY_OF_MONTH)
 
-    var regi : Map[String, Long] = resultMap.get(regiDaylyKey) match {
-      case Some(v) => v.asInstanceOf[Map[String, Long]]
-      case _ => Map.empty[String, Long]
+    val regi : Map[String, Long] = resultMap.get(regiDaylyKey) match {
+      case Some(v) => 
+        val register : Long = v.get("register") match {
+          case Some(v) => v.asInstanceOf[Long]
+          case _ => 0
+        }
+	v + ("register" -> (register + 1))
+      case _ => 
+        Map("register" -> 1)
     }
-    val register : Long = regi.get("register") match {
-      case Some(v) => v.asInstanceOf[Long]
-      case _ => 0
-    }
-    val registerCnt : Long = register + 1
-    regi += ("register" -> registerCnt)
     resultMap += (regiDaylyKey -> regi)
 
 
     //退会日カウント
     c.setTime(w)
-    var withDaylyKey =  c.get(Calendar.YEAR) + "/" + (c.get(Calendar.MONTH) + 1) + "/" + c.get(Calendar.DAY_OF_MONTH)
+    val withDaylyKey =  c.get(Calendar.YEAR) + "/" + (c.get(Calendar.MONTH) + 1) + "/" + c.get(Calendar.DAY_OF_MONTH)
 
-    var wi : Map[String, Long] = resultMap.get(withDaylyKey) match {
-      case Some(v) => v.asInstanceOf[Map[String, Long]]
-      case _ => Map.empty[String, Long]
+    val wi : Map[String, Long] = resultMap.get(withDaylyKey) match {
+      case Some(v) => 
+        val withdraw : Long = v.get("withdraw") match {
+          case Some(v) => v.asInstanceOf[Long]
+          case _ => 0
+        }
+	v + ("withdraw" -> (withdraw + 1))
+      case _ => 
+        Map("withdraw" -> 1)
     }
-    val withdraw : Long = wi.get("withdraw") match {
-      case Some(v) => v.asInstanceOf[Long]
-      case _ => 0
-    }
-    val withdrawCnt : Long = if (w == 0) withdraw else withdraw + 1
-    wi += ("withdraw" -> withdrawCnt)
     resultMap += (withDaylyKey -> wi)
+
 
     print(".")
   }
