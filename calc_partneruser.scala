@@ -9,20 +9,20 @@ var resultMap = Map.empty[String, Map[String, Long]]
 
 try {
   val c = Calendar.getInstance()
+  
+  def getCountKey(d: Date): String = {
+    c.setTime(d)
+    c.get(Calendar.YEAR) + "/" + (c.get(Calendar.MONTH) + 1) + "/" + c.get(Calendar.DAY_OF_MONTH)
+  }
 
   for (line <- file.getLines) {
     JSON.globalNumberParser = {(_:String).toLong}
 
     val json : Option[Any] = JSON.parseFull(line)
     val map : Map[String, Option[Any]] = json.get.asInstanceOf[Map[String, Option[Any]]]
-    val d = new Date(map.get("registerDate").get.asInstanceOf[Long])
-    val w = new Date(map.get("withdrawalDate").get.asInstanceOf[Long])
-
     
     //登録日カウント
-    c.setTime(d)
-    val regiDaylyKey =  c.get(Calendar.YEAR) + "/" + (c.get(Calendar.MONTH) + 1) + "/" + c.get(Calendar.DAY_OF_MONTH)
-
+    val regiDaylyKey = getCountKey(new Date(map.get("registerDate").get.asInstanceOf[Long]))
     val regi : Map[String, Long] = resultMap.get(regiDaylyKey) match {
       case Some(v) => 
         val register : Long = v.get("register") match {
@@ -37,8 +37,7 @@ try {
 
 
     //退会日カウント
-    c.setTime(w)
-    val withDaylyKey =  c.get(Calendar.YEAR) + "/" + (c.get(Calendar.MONTH) + 1) + "/" + c.get(Calendar.DAY_OF_MONTH)
+    val withDaylyKey = getCountKey(new Date(map.get("withdrawalDate").get.asInstanceOf[Long]))
 
     val wi : Map[String, Long] = resultMap.get(withDaylyKey) match {
       case Some(v) => 
