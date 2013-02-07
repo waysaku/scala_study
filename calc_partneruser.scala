@@ -8,10 +8,10 @@ val file = Source.fromFile("/Users/watanabe_yusaku/Dropbox/Private/development/s
 var resultMap = Map.empty[String, Map[String, Long]]
 
 try {
-  val c = Calendar.getInstance()
   
-  def getCountKey(d: Date): String = {
-    c.setTime(d)
+  def getCountKey(jsonMap: Map[String, Option[Any]], key: String): String = {
+    val c = Calendar.getInstance()
+    c.setTime(new Date(jsonMap.get(key).get.asInstanceOf[Long]))
     c.get(Calendar.YEAR) + "/" + (c.get(Calendar.MONTH) + 1) + "/" + c.get(Calendar.DAY_OF_MONTH)
   }
 
@@ -22,7 +22,7 @@ try {
     val map : Map[String, Option[Any]] = json.get.asInstanceOf[Map[String, Option[Any]]]
     
     //登録日カウント
-    val regiDaylyKey = getCountKey(new Date(map.get("registerDate").get.asInstanceOf[Long]))
+    val regiDaylyKey = getCountKey(map, "registerDate")
     val regi : Map[String, Long] = resultMap.get(regiDaylyKey) match {
       case Some(v) => 
         val register : Long = v.get("register") match {
@@ -37,8 +37,7 @@ try {
 
 
     //退会日カウント
-    val withDaylyKey = getCountKey(new Date(map.get("withdrawalDate").get.asInstanceOf[Long]))
-
+    val withDaylyKey = getCountKey(map, "withdrawalDate")
     val wi : Map[String, Long] = resultMap.get(withDaylyKey) match {
       case Some(v) => 
         val withdraw : Long = v.get("withdraw") match {
@@ -50,7 +49,6 @@ try {
         Map("withdraw" -> 1)
     }
     resultMap += (withDaylyKey -> wi)
-
 
     print(".")
   }
